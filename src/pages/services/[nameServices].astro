@@ -3,6 +3,7 @@ import BaseLayout from "../../layouts/BaseLayaout.astro";
 import { SERVICE_DATA } from "../../consts";
 import PrincipalForm from "../../components/PrincipalForm/index.astro";
 import Button from "../../components/Button/index.astro";
+export const prerender = false; // ← Agregar esta línea al inicio
 
 export function getStaticPaths() {
   return SERVICE_DATA.services.flatMap((service) => ({
@@ -12,7 +13,7 @@ export function getStaticPaths() {
 
 const { nameServices } = Astro.params;
 const currentService = SERVICE_DATA.services.find(
-  (service) => service.nameUrl === nameServices
+  (service) => service.nameUrl === nameServices,
 );
 
 if (!currentService) {
