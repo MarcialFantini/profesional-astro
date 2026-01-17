@@ -1,0 +1,154 @@
+---
+import Button from "../Button/index.astro";
+---
+
+<div class="bg-white p-8 rounded-lg shadow-md max-w-[942px] mx-auto">
+  <h2 class="text-2xl font-bold mb-2">
+    Solicita tu presupuesto sin compromiso
+  </h2>
+  <p class="text-gray-600 mb-4">
+    completa el formulario y una de nuestros profesionales se pondra en contacto
+    con vos a la brevedad.
+  </p>
+
+  <form
+    id="contact-form"
+    method="POST"
+    action="/api/contact"
+    novalidate
+    class="flex flex-col gap-5"
+  >
+    <!-- Honeypot (anti bots) -->
+    <input
+      type="text"
+      name="company"
+      tabindex="-1"
+      autocomplete="off"
+      class="hidden"
+    />
+
+    <div class="flex flex-col gap-1">
+      <label for="nombre" class="font-semibold text-sm">Name</label>
+      <input
+        type="text"
+        id="nombre"
+        name="nombre"
+        required
+        minlength="3"
+        class="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-sky-700"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="telefono" class="font-semibold text-sm">Phone</label>
+      <input
+        type="tel"
+        id="telefono"
+        name="telefono"
+        required
+        inputmode="numeric"
+        autocomplete="tel"
+        class="border border-gray-300 rounded-md p-2"
+      />
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="servicio" class="font-semibold text-sm"
+        >Service required</label
+      >
+      <select
+        id="servicio"
+        name="servicio"
+        required
+        class="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-sky-700"
+      >
+        <option value="">Selecciona una opción</option>
+        <option value="reparacion">Reparación</option>
+        <option value="instalacion">Instalación</option>
+        <option value="mantenimiento">Mantenimiento</option>
+      </select>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label for="mensaje" class="font-semibold text-sm">Message</label>
+      <textarea
+        id="mensaje"
+        name="mensaje"
+        rows="4"
+        required
+        minlength="10"
+        class="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-sky-700"
+      ></textarea>
+    </div>
+
+    <div id="form-messages" class="hidden mb-4">
+      <p id="success-message" class="hidden text-green-600 font-semibold">
+        ¡Mensaje enviado con éxito!
+      </p>
+      <p id="error-message" class="hidden text-red-600 font-semibold"></p>
+    </div>
+
+    <Button text="Ask for a quote" type="submit" id="submit-btn" />
+  </form>
+</div>
+
+<script>
+  const form = document.getElementById("contact-form") as HTMLFormElement;
+  const successMsg = document.getElementById("success-message");
+  const errorMsg = document.getElementById("error-message");
+  const messagesContainer = document.getElementById("form-messages");
+  const submitBtn = document.getElementById("submit-btn") as HTMLButtonElement;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    hideMessages();
+
+    // HTML5 validation
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    const formData = new FormData(form);
+
+    try {
+      submitBtn.disabled = true;
+
+      const res = await fetch(form.action, {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.error || "Error inesperado");
+      }
+
+      showSuccess();
+      form.reset();
+    } catch (err: any) {
+      showError(err.message || "No se pudo enviar el formulario");
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+
+  function showSuccess() {
+    messagesContainer?.classList.remove("hidden");
+    successMsg?.classList.remove("hidden");
+  }
+
+  function showError(msg: string) {
+    messagesContainer?.classList.remove("hidden");
+    errorMsg!.textContent = msg;
+    errorMsg?.classList.remove("hidden");
+  }
+
+  function hideMessages() {
+    messagesContainer?.classList.add("hidden");
+    successMsg?.classList.add("hidden");
+    errorMsg?.classList.add("hidden");
+  }
+</script>
