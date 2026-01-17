@@ -8,7 +8,7 @@ Ejecutar el siguiente comando para instalar los paquetes necesarios:
 pnpm i
 ```
 
-````
+
 
 ---
 
